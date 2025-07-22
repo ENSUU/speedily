@@ -9,12 +9,16 @@ export default function Home() {
   const userInputRef = useRef(null);
   const [currCharIndex, setCurrCharIndex] = useState(0);
   const [quote, setQuote] = useState(
-    // "Hello, my name is David.",
-    "I'm selfish, impatient and a little insecure. I make mistakes, I am out of control and at times hard to handle. But if you can't handle me at my worst, then you sure as hell don't deserve me at my best.",
+    "Hello, my name is David.",
+    // "I'm selfish, impatient and a little insecure. I make mistakes, I am out of control and at times hard to handle. But if you can't handle me at my worst, then you sure as hell don't deserve me at my best.",
   );
 
   // Global index. Needed for character input validation by user.
   let runningIndex = 0;
+
+  // Timing state. Needed to calculate WPM
+  const [startTime, setStartTime] = useState<number | null>(null);
+  const [endTime, setEndTime] = useState<number | null>(null);
 
   // Grab the indices for each space character in input quote. Used to add spans containing spaces when rendering quote.
   const space_indices: Set<number> = new Set();
@@ -26,10 +30,22 @@ export default function Home() {
 
   useEffect(() => {
     userInputRef.current.focus();
+    console.log(userInput);
   }, []);
 
   const handleKeyDown = (e) => {
     e.preventDefault();
+
+    if (!startTime) {
+      setStartTime(Date.now());
+    }
+
+    if (userInput == quote) {
+      const recorded_end_time = Date.now();
+      setEndTime(recorded_end_time);
+      getWPM(startTime, recorded_end_time);
+    }
+
     if (e.key == "Backspace") {
       setUserInput((prev_input) => prev_input.slice(0, -1));
       setCurrCharIndex((prev_index) => Math.max(0, prev_index - 1));
@@ -41,12 +57,20 @@ export default function Home() {
   };
 
   const getCharClass = (char: string, index: number) => {
-    console.log(`Inputted char: ${userInput[index]} | Expected char: ${char}`);
     if (index < userInput.length) {
       return char == quote[index] ? "text-green-400" : "text-red-400";
     } else if (index == userInput.length) {
       return "text-yellow-400";
     }
+  };
+
+  const getWPM = (startTime, endTime) => {
+    if (!startTime || !endTime) {
+      return null;
+    }
+    const attempt_duration = (endTime - startTime) / 1000;
+    console.log((userInput.length / 5 / (attempt_duration / 60)).toFixed(2));
+    return (userInput.length / 5 / (attempt_duration / 60)).toFixed(2);
   };
 
   return (
@@ -86,6 +110,11 @@ export default function Home() {
             runningIndex += word.length + 1;
             return word_span;
           })}
+        </div>
+        <div className="flex justify-center mt-4">
+          {!getWPM(startTime, endTime) ? null : (
+            <h1>{"Your raw WPM is: " + getWPM(startTime, endTime)}</h1>
+          )}
         </div>
       </div>
       <div>
