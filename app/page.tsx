@@ -8,6 +8,8 @@ export default function Home() {
   const [userInput, setUserInput] = useState("");
   const userInputRef = useRef(null);
   const [currCharIndex, setCurrCharIndex] = useState(0);
+  const [numChars, setNumChars] = useState(0);
+  const [numIncorrectChars, setNumIncorrectChars] = useState(0);
   const [quote, setQuote] = useState(
     "Hello, my name is David.",
     // "I'm selfish, impatient and a little insecure. I make mistakes, I am out of control and at times hard to handle. But if you can't handle me at my worst, then you sure as hell don't deserve me at my best.",
@@ -30,20 +32,21 @@ export default function Home() {
 
   useEffect(() => {
     userInputRef.current.focus();
-    console.log(userInput);
   }, []);
+
+  const isTestComplete = () => {
+    if (userInput == quote) {
+      return true;
+    }
+    return false;
+  };
 
   const handleKeyDown = (e) => {
     e.preventDefault();
 
     if (!startTime) {
       setStartTime(Date.now());
-    }
-
-    if (userInput == quote) {
-      const recorded_end_time = Date.now();
-      setEndTime(recorded_end_time);
-      getWPM(startTime, recorded_end_time);
+      console.log("Timer started. ");
     }
 
     if (e.key == "Backspace") {
@@ -51,8 +54,20 @@ export default function Home() {
       setCurrCharIndex((prev_index) => Math.max(0, prev_index - 1));
     } else if (e.key.length == 1) {
       const newChar = e.key;
+      setNumChars((prev_count) => prev_count + 1);
+      checkCorrectChar(newChar);
       setUserInput((prev_input) => prev_input + newChar);
       setCurrCharIndex((prev_index) => (prev_index += 1));
+    }
+
+    // Need to do this because userInput is not updated because state is updated in batches; Can't use it to check equality with quote.
+    const newUserInput = userInput + e.key;
+
+    if (newUserInput == quote) {
+      const recorded_end_time = Date.now();
+      console.log(recorded_end_time);
+      console.log("Finished.");
+      setEndTime(recorded_end_time);
     }
   };
 
@@ -64,13 +79,31 @@ export default function Home() {
     }
   };
 
-  const getWPM = (startTime, endTime) => {
+  const checkCorrectChar = (inputChar) => {
+    if (inputChar != quote.split("")[currCharIndex]) {
+      console.log(
+        `Expected ${quote.split("")[currCharIndex]} but typed ${inputChar}`,
+      );
+      setNumIncorrectChars((prev_count) => prev_count + 1);
+    }
+  };
+
+  const getRawWPM = (startTime, endTime) => {
     if (!startTime || !endTime) {
       return null;
     }
     const attempt_duration = (endTime - startTime) / 1000;
     console.log((userInput.length / 5 / (attempt_duration / 60)).toFixed(2));
-    return (userInput.length / 5 / (attempt_duration / 60)).toFixed(2);
+    return Math.round(userInput.length / 5 / (attempt_duration / 60));
+  };
+
+  const getNetWPM = (startTime, endTime, rawWPM) => {
+    if (!startTime || !endTime) {
+      return null;
+    }
+    const attempt_duration = (endTime - startTime) / 1000;
+    const calculatedNetWPM = rawWPM - numIncorrectChars / attempt_duration;
+    return Math.round(calculatedNetWPM);
   };
 
   return (
@@ -111,9 +144,26 @@ export default function Home() {
             return word_span;
           })}
         </div>
-        <div className="flex justify-center mt-4">
-          {!getWPM(startTime, endTime) ? null : (
-            <h1>{"Your raw WPM is: " + getWPM(startTime, endTime)}</h1>
+        <div
+          id="debugging-div"
+          className="flex flex-col justify-center items-center mt-4"
+        >
+          <h1>Current Char Index: {currCharIndex} </h1>
+          <p>Expecting the character {quote[currCharIndex]} to be typed.</p>
+          <h1>
+            Accuracy:
+            {"\u00A0" +
+              Math.round(((numChars - numIncorrectChars) / numChars) * 100)}
+            %
+          </h1>
+          {isTestComplete() && (
+            <>
+              <h1>{"Your raw WPM is: " + getRawWPM(startTime, endTime)} </h1>
+              <h1>
+                {"Your net WPM is: " +
+                  getNetWPM(startTime, endTime, getRawWPM(startTime, endTime))}
+              </h1>
+            </>
           )}
         </div>
       </div>
@@ -124,6 +174,7 @@ export default function Home() {
             type="text"
             onKeyDown={handleKeyDown}
             ref={userInputRef}
+            disabled={userInput == quote ? true : false}
           />
         </Form>
       </div>
