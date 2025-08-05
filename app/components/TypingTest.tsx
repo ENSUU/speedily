@@ -132,39 +132,47 @@ const TypingTest = ({ restartFunction }) => {
 
   return (
     <>
-      <div className="w-[800px] flex flex-wrap justify-center m-auto text-2xl">
-        {quote != "" &&
-          quote.split(" ").map((word, word_index) => {
-            getSpaceIndices();
-            const word_span = (
-              <span key={word_index} className="inline-block whitespace-nowrap">
-                {word.split("").map((char, char_index) => {
-                  const global_index = runningIndex + char_index;
-                  const typed_char = userInput[global_index];
-                  const space_span =
-                    space_indices.has(global_index + 1) &&
-                    word_index < quote.split(" ").length - 1 ? (
-                      <span key={`space-${char_index}`}>{"\u00A0"}</span>
-                    ) : null;
+      <div
+        id="quote-container"
+        className="h-[16rem] flex justify-center items-center"
+      >
+        <div className="w-[800px] flex flex-wrap justify-center items-center m-auto text-2xl">
+          {quote != "" &&
+            quote.split(" ").map((word, word_index) => {
+              getSpaceIndices();
+              const word_span = (
+                <span
+                  key={word_index}
+                  className="inline-block whitespace-nowrap"
+                >
+                  {word.split("").map((char, char_index) => {
+                    const global_index = runningIndex + char_index;
+                    const typed_char = userInput[global_index];
+                    const space_span =
+                      space_indices.has(global_index + 1) &&
+                      word_index < quote.split(" ").length - 1 ? (
+                        <span key={`space-${char_index}`}>{"\u00A0"}</span>
+                      ) : null;
 
-                  return (
-                    <>
-                      <span
-                        key={char_index}
-                        className={getCharClass(typed_char, global_index)}
-                      >
-                        {char}
-                      </span>
-                      {space_span}
-                    </>
-                  );
-                })}
-              </span>
-            );
+                    return (
+                      <>
+                        <span
+                          key={char_index}
+                          className={getCharClass(typed_char, global_index)}
+                        >
+                          {char}
+                        </span>
+                        {space_span}
+                      </>
+                    );
+                  })}
+                </span>
+              );
 
-            runningIndex += word.length + 1;
-            return word_span;
-          })}
+              runningIndex += word.length + 1;
+              return word_span;
+            })}
+        </div>
       </div>
       <div id="quote-author" className="flex items-center justify-center mt-4">
         <h1> - {quoteAuthor}</h1>
