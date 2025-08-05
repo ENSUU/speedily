@@ -4,10 +4,10 @@ import Form from "next/form";
 const TypingTest = ({ restartFunction }) => {
   const [userInput, setUserInput] = useState("");
   const userInputRef = useRef<HTMLInputElement>(null);
+  const restartButtonRef = useRef<HTMLButtonElement>(null);
   const [currCharIndex, setCurrCharIndex] = useState(0);
   const [numChars, setNumChars] = useState(0);
   const [numIncorrectChars, setNumIncorrectChars] = useState(0);
-
   const [isTestComplete, setIsTestComplete] = useState(false);
 
   const [quote, setQuote] = useState(
@@ -72,6 +72,7 @@ const TypingTest = ({ restartFunction }) => {
       console.log("Finished.");
       setEndTime(recorded_end_time);
       setIsTestComplete(true);
+      restartButtonRef.current?.focus();
     }
   };
 
@@ -193,7 +194,7 @@ const TypingTest = ({ restartFunction }) => {
             %
           </h1>
           {userInput == quote && <h1>|</h1>}
-          {isTestComplete() && (
+          {isTestComplete && (
             <>
               <h1>{"Your raw WPM is: " + getRawWPM(startTime, endTime)} </h1>
               <h1> | </h1>
@@ -209,7 +210,7 @@ const TypingTest = ({ restartFunction }) => {
           className="w-[12rem] text-white font-bold bg-black px-6 py-2 rounded-md hover:scale-[1.1]"
           onClick={handleRestartBtnClick}
           onKeyDown={handleEnterPressed}
-          autoFocus
+          ref={restartButtonRef}
         >
           Next Test
         </button>
