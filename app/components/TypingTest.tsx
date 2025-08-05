@@ -134,7 +134,7 @@ const TypingTest = ({ restartFunction }) => {
     <>
       <div
         id="quote-container"
-        className="h-[16rem] flex justify-center items-center"
+        className="h-[16rem] flex flex-col justify-center items-center"
       >
         <div className="w-[800px] flex flex-wrap justify-center items-center m-auto text-2xl">
           {quote != "" &&
@@ -173,39 +173,46 @@ const TypingTest = ({ restartFunction }) => {
               return word_span;
             })}
         </div>
-      </div>
-      <div id="quote-author" className="flex items-center justify-center mt-4">
-        <h1> - {quoteAuthor}</h1>
+        <div id="quote-author" className="flex items-center justify-center">
+          <h1> - {quoteAuthor}</h1>
+        </div>
       </div>
       <div
-        id="user-stats"
-        className="flex flex-col items-center justify-center gap-2 my-4"
+        id="user-stats-container"
+        className="h-[16rem] flex flex-col flex-wrap items-center"
       >
-        <h1>
-          Accuracy:
-          {"\u00A0" +
-            (numChars <= 0
-              ? 0
-              : Math.round(((numChars - numIncorrectChars) / numChars) * 100))}
-          %
-        </h1>
-        {isTestComplete && (
-          <>
-            <h1>{"Your raw WPM is: " + getRawWPM(startTime, endTime)} </h1>
-            <h1>
-              {"Your net WPM is: " +
-                getNetWPM(startTime, endTime, getRawWPM(startTime, endTime))}
-            </h1>
-            <button
-              type="button"
-              className="text-white font-bold bg-black px-6 py-2 rounded-md hover:scale-[1.1]"
-              onClick={handleRestartBtnClick}
-              onKeyDown={handleEnterPressed}
-            >
-              Next Test
-            </button>
-          </>
-        )}
+        <div className="flex flex-wrap items-center justify-center gap-2 my-4">
+          <h1>
+            Accuracy:
+            {"\u00A0" +
+              (numChars <= 0
+                ? 0
+                : Math.round(
+                    ((numChars - numIncorrectChars) / numChars) * 100,
+                  ))}
+            %
+          </h1>
+          {userInput == quote && <h1>|</h1>}
+          {isTestComplete() && (
+            <>
+              <h1>{"Your raw WPM is: " + getRawWPM(startTime, endTime)} </h1>
+              <h1> | </h1>
+              <h1>
+                {"Your net WPM is: " +
+                  getNetWPM(startTime, endTime, getRawWPM(startTime, endTime))}
+              </h1>
+            </>
+          )}
+        </div>
+        <button
+          type="button"
+          className="w-[12rem] text-white font-bold bg-black px-6 py-2 rounded-md hover:scale-[1.1]"
+          onClick={handleRestartBtnClick}
+          onKeyDown={handleEnterPressed}
+          autoFocus
+        >
+          Next Test
+        </button>
       </div>
       {/* <div
         id="debugging-div"
