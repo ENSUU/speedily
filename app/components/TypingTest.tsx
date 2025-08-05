@@ -3,15 +3,17 @@ import Form from "next/form";
 
 const TypingTest = ({ restartFunction }) => {
   const [userInput, setUserInput] = useState("");
-  const userInputRef = useRef(null);
+  const userInputRef = useRef<HTMLInputElement>(null);
   const [currCharIndex, setCurrCharIndex] = useState(0);
   const [numChars, setNumChars] = useState(0);
   const [numIncorrectChars, setNumIncorrectChars] = useState(0);
 
   const [quote, setQuote] = useState(
-    "Hello, my name is David.",
+    "",
+    // "Hello, my name is David.",
     // "I'm selfish, impatient and a little insecure. I make mistakes, I am out of control and at times hard to handle. But if you can't handle me at my worst, then you sure as hell don't deserve me at my best.",
   );
+  const [quoteAuthor, setQuoteAuthor] = useState("");
 
   // Global index. Needed for character input validation by user.
   let runningIndex = 0;
@@ -20,17 +22,25 @@ const TypingTest = ({ restartFunction }) => {
   const [startTime, setStartTime] = useState<number | null>(null);
   const [endTime, setEndTime] = useState<number | null>(null);
 
-  // Grab the indices for each space character in input quote. Used to add spans containing spaces when rendering quote.
-  const space_indices: Set<number> = new Set();
-  quote.split("").forEach((char, index) => {
-    if (char == " ") {
-      space_indices.add(index);
-    }
-  });
+  useEffect(() => {
+    const fetchQuote = async () => {
+      try {
+        const response = await fetch("https://api.quotable.io/quotes/random");
+        const json = await response.json();
+        setQuote(json[0].content);
+        setQuoteAuthor(json[0].author);
+      } catch (err) {
+        setQuote("Unable to generate a quote. Please try again later!");
+        setQuoteAuthor("ENSUU");
+        console.error(err);
+      }
+    };
+    fetchQuote();
+  }, []);
 
   useEffect(() => {
-    userInputRef.current.focus();
-  }, []);
+    userInputRef.current?.focus();
+  }, [quote]);
 
   const isTestComplete = () => {
     if (userInput == quote) {
@@ -108,39 +118,54 @@ const TypingTest = ({ restartFunction }) => {
     restartFunction();
   };
 
+  // Grab the indices for each space character in input quote. Used to add spans containing spaces when rendering quote.
+  const space_indices: Set<number> = new Set();
+  const getSpaceIndices = () => {
+    quote.split("").forEach((char, index) => {
+      if (char == " ") {
+        space_indices.add(index);
+      }
+    });
+  };
+
   return (
     <>
-      <div className="flex flex-wrap justify-center m-auto text-2xl">
-        {quote.split(" ").map((word, word_index) => {
-          const word_span = (
-            <span key={word_index} className="inline-block whitespace-nowrap">
-              {word.split("").map((char, char_index) => {
-                const global_index = runningIndex + char_index;
-                const typed_char = userInput[global_index];
-                const space_span =
-                  space_indices.has(global_index + 1) &&
-                  word_index < quote.split(" ").length - 1 ? (
-                    <span key={`space-${word_index}`}>{"\u00A0"}</span>
-                  ) : null;
+      <div className="w-[800px] flex flex-wrap justify-center m-auto text-2xl">
+        {quote != "" &&
+          quote.split(" ").map((word, word_index) => {
+            getSpaceIndices();
+            const word_span = (
+              <span key={word_index} className="inline-block whitespace-nowrap">
+                {word.split("").map((char, char_index) => {
+                  const global_index = runningIndex + char_index;
+                  const typed_char = userInput[global_index];
+                  const space_span =
+                    space_indices.has(global_index + 1) &&
+                    word_index < quote.split(" ").length - 1 ? (
+                      <span key={`space-${char_index}`}>{"\u00A0"}</span>
+                    ) : null;
 
-                return (
-                  <>
-                    <span
-                      key={char_index}
-                      className={getCharClass(typed_char, global_index)}
-                    >
-                      {char}
-                    </span>
-                    {space_span}
-                  </>
-                );
-              })}
-            </span>
-          );
+                  return (
+                    <>
+                      <span
+                        key={char_index}
+                        className={getCharClass(typed_char, global_index)}
+                      >
+                        {char}
+                      </span>
+                      {space_span}
+                    </>
+                  );
+                })}
+              </span>
+            );
 
-          runningIndex += word.length + 1;
-          return word_span;
-        })}
+            runningIndex += word.length + 1;
+            return word_span;
+          })}
+      </div>
+      <div id="quote-author" className="flex items-center justify-center mt-4">
+        <h1> - {quoteAuthor}</h1>
       </div>
       <div
         id="user-stats"
@@ -171,13 +196,13 @@ const TypingTest = ({ restartFunction }) => {
           </>
         )}
       </div>
-      <div
+      {/* <div
         id="debugging-div"
         className="flex flex-col justify-center items-center mt-4 border-2 border-black"
       >
         <h1>Current Char Index: {currCharIndex} </h1>
         <p>Expecting the character {quote[currCharIndex]} to be typed.</p>
-      </div>
+      </div> */}
       <div>
         <Form className="flex justify-center items-center mt-12" action="">
           <input
