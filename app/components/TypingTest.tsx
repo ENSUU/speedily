@@ -26,12 +26,22 @@ const TypingTest = ({ restartFunction }) => {
   const [startTime, setStartTime] = useState<number | null>(null);
   const [endTime, setEndTime] = useState<number | null>(null);
 
+  const cleanFetchedQuote = (quote) => {
+    const quoteChars = quote.split(" ");
+    for (let i = 0; i < quoteChars.length; i++) {
+      if (quoteChars[i] == "—") {
+        quoteChars[i] = "-";
+      }
+    }
+    return quoteChars.join(" ");
+  };
+
   useEffect(() => {
     const fetchQuote = async () => {
       try {
         const response = await fetch("https://api.quotable.io/quotes/random");
         const json = await response.json();
-        setQuote(json[0].content);
+        setQuote(cleanFetchedQuote(json[0].content));
         setQuoteAuthor(json[0].author);
       } catch (err) {
         setQuote("Unable to generate a quote. Please try again later!");
