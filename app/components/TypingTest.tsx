@@ -10,6 +10,7 @@ const TypingTest = ({ restartFunction }) => {
   const [numIncorrectChars, setNumIncorrectChars] = useState(0);
   const [isTestComplete, setIsTestComplete] = useState(false);
 
+  // Quote state.
   const [quote, setQuote] = useState(
     "",
     // "Hello, my name is David.",
@@ -19,6 +20,7 @@ const TypingTest = ({ restartFunction }) => {
 
   // Global index. Needed for character input validation by user.
   let runningIndex = 0;
+  let globalIndex = 0;
 
   // Timing state. Needed to calculate WPM
   const [startTime, setStartTime] = useState<number | null>(null);
@@ -42,7 +44,8 @@ const TypingTest = ({ restartFunction }) => {
 
   useEffect(() => {
     userInputRef.current?.focus();
-  }, [quote]);
+    restartButtonRef.current?.focus();
+  }, [quote, isTestComplete]);
 
   const handleKeyDown = (e) => {
     e.preventDefault();
@@ -78,13 +81,15 @@ const TypingTest = ({ restartFunction }) => {
 
   const getCharClass = (char: string, index: number) => {
     if (index < userInput.length) {
-      return char == quote[index] ? "text-green-400" : "text-red-400";
+      console.log(char, quote[index]);
+      return char === quote[index] ? "bg-green-400/50" : "bg-red-400/50";
     } else if (index == userInput.length) {
-      return "text-yellow-400";
+      return "bg-yellow-400/50";
     }
   };
 
   const checkCorrectChar = (inputChar) => {
+    console.log(inputChar, quote.split("")[currCharIndex]);
     if (inputChar != quote.split("")[currCharIndex]) {
       console.log(
         `Expected ${quote.split("")[currCharIndex]} but typed ${inputChar}`,
@@ -137,7 +142,7 @@ const TypingTest = ({ restartFunction }) => {
         id="quote-container"
         className="h-[16rem] flex flex-col justify-center items-center"
       >
-        <div className="w-[800px] flex flex-wrap justify-center items-center m-auto text-2xl">
+        {/* <div className="w-[800px] flex flex-wrap justify-center items-center m-auto text-2xl">
           {quote != "" &&
             quote.split(" ").map((word, word_index) => {
               getSpaceIndices();
@@ -152,7 +157,12 @@ const TypingTest = ({ restartFunction }) => {
                     const space_span =
                       space_indices.has(global_index + 1) &&
                       word_index < quote.split(" ").length - 1 ? (
-                        <span key={`space-${char_index}`}>{"\u00A0"}</span>
+                        <span
+                          key={`space-${char_index}`}
+                          className={getCharClass(typed_char, global_index)}
+                        >
+                          {"\u00A0"}
+                        </span>
                       ) : null;
 
                     return (
@@ -173,6 +183,40 @@ const TypingTest = ({ restartFunction }) => {
               runningIndex += word.length + 1;
               return word_span;
             })}
+        </div> */}
+        <div className="w-[900px] flex flex-wrap justify-center m-auto text-2xl">
+          {quote !== "" &&
+            quote.split(" ").map((word, wordIndex) => (
+              <div key={wordIndex} className="text-[30px]">
+                <span key={wordIndex}>
+                  {word.split("").map((letter, letterIndex) => {
+                    const currentIndex = globalIndex++;
+                    return (
+                      <span
+                        key={`${wordIndex}-${letterIndex}`}
+                        className={getCharClass(
+                          userInput[currentIndex],
+                          currentIndex,
+                        )}
+                      >
+                        {letter}
+                      </span>
+                    );
+                  })}
+                </span>
+                {wordIndex < quote.split(" ").length - 1 && (
+                  <span
+                    key={`space-${wordIndex}`}
+                    className={getCharClass(
+                      userInput[globalIndex],
+                      globalIndex++,
+                    )}
+                  >
+                    {"\u00A0"}
+                  </span>
+                )}
+              </div>
+            ))}
         </div>
         <div id="quote-author" className="flex items-center justify-center">
           <h1> - {quoteAuthor}</h1>
@@ -205,15 +249,17 @@ const TypingTest = ({ restartFunction }) => {
             </>
           )}
         </div>
-        <button
-          type="button"
-          className="w-[12rem] text-white font-bold bg-black px-6 py-2 rounded-md hover:scale-[1.1]"
-          onClick={handleRestartBtnClick}
-          onKeyDown={handleEnterPressed}
-          ref={restartButtonRef}
-        >
-          Next Test
-        </button>
+        {isTestComplete && (
+          <button
+            type="button"
+            className="w-[12rem] text-white font-bold bg-black px-6 py-2 rounded-md hover:scale-[1.1]"
+            onClick={handleRestartBtnClick}
+            onKeyDown={handleEnterPressed}
+            ref={restartButtonRef}
+          >
+            Next
+          </button>
+        )}
       </div>
       {/* <div
         id="debugging-div"
