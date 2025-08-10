@@ -1,6 +1,5 @@
 "use client";
 
-import Navbar from "./components/Navbar";
 import { useState } from "react";
 import TypingTest from "./components/TypingTest";
 import "./globals.css";
@@ -14,7 +13,6 @@ export default function Home() {
 
   return (
     <>
-      <Navbar />
       <TypingTest key={testKey} restartFunction={handleRestartButtonClick} />
     </>
   );

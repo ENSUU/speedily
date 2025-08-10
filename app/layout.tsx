@@ -1,3 +1,6 @@
+import "./globals.css";
+import Navbar from "./components/Navbar";
+
 export default function DashboardLayout({
   children,
 }: {
@@ -8,7 +11,10 @@ export default function DashboardLayout({
       <body>
         {/* Layout UI */}
         {/* Place children where you want to render a page or nested layout */}
-        <main>{children}</main>
+        <main className="h-dvh flex flex-col justify-center items-center">
+          <Navbar />
+          {children}
+        </main>
       </body>
     </html>
   );

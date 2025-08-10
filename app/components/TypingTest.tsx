@@ -147,54 +147,12 @@ const TypingTest = ({ restartFunction }) => {
   };
 
   return (
-    <>
+    <div className="flex flex-col justify-center items-center my-auto">
       <div
         id="quote-container"
-        className="h-[16rem] flex flex-col justify-center items-center"
+        className="w-[75vw] h-[16rem] flex flex-col justify-center items-center"
       >
-        {/* <div className="w-[800px] flex flex-wrap justify-center items-center m-auto text-2xl">
-          {quote != "" &&
-            quote.split(" ").map((word, word_index) => {
-              getSpaceIndices();
-              const word_span = (
-                <span
-                  key={word_index}
-                  className="inline-block whitespace-nowrap"
-                >
-                  {word.split("").map((char, char_index) => {
-                    const global_index = runningIndex + char_index;
-                    const typed_char = userInput[global_index];
-                    const space_span =
-                      space_indices.has(global_index + 1) &&
-                      word_index < quote.split(" ").length - 1 ? (
-                        <span
-                          key={`space-${char_index}`}
-                          className={getCharClass(typed_char, global_index)}
-                        >
-                          {"\u00A0"}
-                        </span>
-                      ) : null;
-
-                    return (
-                      <>
-                        <span
-                          key={char_index}
-                          className={getCharClass(typed_char, global_index)}
-                        >
-                          {char}
-                        </span>
-                        {space_span}
-                      </>
-                    );
-                  })}
-                </span>
-              );
-
-              runningIndex += word.length + 1;
-              return word_span;
-            })}
-        </div> */}
-        <div className="w-[900px] flex flex-wrap justify-center m-auto text-2xl">
+        <div className="flex flex-wrap justify-center my-auto text-2xl">
           {quote !== "" &&
             quote.split(" ").map((word, wordIndex) => (
               <div key={wordIndex} className="text-[30px]">
@@ -228,13 +186,16 @@ const TypingTest = ({ restartFunction }) => {
               </div>
             ))}
         </div>
-        <div id="quote-author" className="flex items-center justify-center">
+        <div
+          id="quote-author"
+          className="flex items-center justify-center my-4"
+        >
           <h1> - {quoteAuthor}</h1>
         </div>
       </div>
       <div
         id="user-stats-container"
-        className="h-[16rem] flex flex-col flex-wrap items-center"
+        className="h-[16rem] flex flex-col flex-wrap items-center my-4"
       >
         <div className="flex flex-wrap items-center justify-center gap-2 my-4">
           <h1>
@@ -289,7 +250,7 @@ const TypingTest = ({ restartFunction }) => {
           />
         </Form>
       </div>
-    </>
+    </div>
   );
 };
 
