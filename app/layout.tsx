@@ -1,7 +1,11 @@
-import "./globals.css";
-import Navbar from "./components/Navbar";
+"use client";
 
-export default function DashboardLayout({
+import "./globals.css";
+
+import Navbar from "./components/Navbar";
+import { UserProvider } from "./_context/userContext";
+
+export default function HomeLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -12,8 +16,10 @@ export default function DashboardLayout({
         {/* Layout UI */}
         {/* Place children where you want to render a page or nested layout */}
         <main className="h-dvh flex flex-col justify-center items-center">
-          <Navbar />
-          {children}
+          <UserProvider>
+            <Navbar />
+            {children}
+          </UserProvider>
         </main>
       </body>
     </html>

@@ -1,9 +1,11 @@
 "use client";
+
 import Form from "next/form";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "../../supabaseClient";
 import { useState } from "react";
+import { useUser } from "../_context/userContext";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -11,6 +13,8 @@ const LoginPage = () => {
   const [errorMessage, setErrorMessage] = useState("");
 
   const router = useRouter();
+
+  const { setUser } = useUser();
 
   const loginUser = async (e) => {
     e.preventDefault();
@@ -22,7 +26,7 @@ const LoginPage = () => {
     if (error) {
       setErrorMessage(error.message);
     } else {
-      console.log(data);
+      setUser(data);
       router.push("/");
     }
   };
