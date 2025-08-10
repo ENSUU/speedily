@@ -1,10 +1,10 @@
 import Form from "next/form";
 import Link from "next/link";
 
-const LoginPage = () => {
+const SignupPage = () => {
   return (
     <div className="w-[400px]">
-      <h1 className="font-bold text-3xl my-2">Login</h1>
+      <h1 className="font-bold text-3xl my-2">Sign Up</h1>
       <Form className="flex flex-col gap-4">
         <div className="flex flex-col">
           <label htmlFor="username">Username</label>
@@ -18,12 +18,20 @@ const LoginPage = () => {
             className="border-2 rounded-sm"
           />
         </div>
+        <div className="flex flex-col">
+          <label htmlFor="confirmPassword">Confirm Password</label>
+          <input
+            id="confirmPassword"
+            type="password"
+            className="border-2 rounded-sm"
+          />
+        </div>
         <button className="w-full text-white font-bold bg-black px-6 py-2 rounded-md hover:scale-[1.1]">
-          Log In
+          Sign Up
         </button>
         <p>
-          Don't have an account? Sign up{" "}
-          <Link href="signup" className="text-blue-500">
+          Already have an account? Log in{" "}
+          <Link href="login" className="text-blue-500">
             here.
           </Link>
         </p>
@@ -32,4 +40,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default SignupPage;
