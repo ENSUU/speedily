@@ -5,9 +5,10 @@ import TypingTest from "./components/TypingTest";
 import "./globals.css";
 
 export default function Home() {
-  const [testKey, setTestKey] = useState(0);
-  const handleRestartButtonClick = () => {
-    console.log("Button clicked.");
+  const [testKey, setTestKey] = useState<number>(0);
+  const handleRestartButtonClick: React.MouseEventHandler<
+    HTMLButtonElement
+  > = () => {
     setTestKey((prev) => prev + 1);
   };
 

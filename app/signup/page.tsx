@@ -12,6 +12,7 @@ const SignupPage = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordsMatch, setPasswordsMatch] = useState(true);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const router = useRouter();
 
@@ -27,12 +28,10 @@ const SignupPage = () => {
       });
 
       if (error) {
-        console.error(error);
+        setErrorMessage(error.message);
       } else {
-        console.log(data);
+        router.push("/login");
       }
-
-      router.push("/login");
     }
   };
 
@@ -70,6 +69,7 @@ const SignupPage = () => {
         {!passwordsMatch && (
           <p className="text-red-600">Passwords do not match!</p>
         )}
+        {errorMessage != "" && <p className="text-red-600">{errorMessage}</p>}
         <button
           className="w-full text-white font-bold bg-black px-6 py-2 rounded-md hover:scale-[1.1]"
           onClick={createUser}

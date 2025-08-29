@@ -8,17 +8,16 @@ import { useState } from "react";
 import { useUser } from "../_context/userContext";
 
 const LoginPage = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   const router = useRouter();
-
-  const { setUser } = useUser();
+  const { dispatch } = useUser();
 
   const loginUser = async (e) => {
     e.preventDefault();
-    let { data, error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email: email,
       password: password,
     });
@@ -26,7 +25,10 @@ const LoginPage = () => {
     if (error) {
       setErrorMessage(error.message);
     } else {
-      setUser(data);
+      dispatch({
+        type: "Login",
+        payload: { user_id: data.user.id, email: data.user.email },
+      });
       router.push("/");
     }
   };
@@ -40,7 +42,7 @@ const LoginPage = () => {
           <input
             id="email"
             type="text"
-            className="border-2 rounded-sm"
+            className="!border-b-1 !border-black"
             onChange={(e) => {
               setEmail(e.target.value);
             }}
@@ -51,7 +53,7 @@ const LoginPage = () => {
           <input
             id="password"
             type="password"
-            className="border-2 rounded-sm"
+            className="!border-b-1 !border-black"
             onChange={(e) => {
               setPassword(e.target.value);
             }}

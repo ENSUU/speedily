@@ -1,14 +1,21 @@
 "use client";
 
-import { createContext, useState, useContext } from "react";
+import { userInitialState } from "../_state/initialState";
+import { Dispatch, ReactNode, useReducer } from "react";
+import { userReducer } from "../_state/userReducer";
+import { createContext, useContext } from "react";
+import { User, UserAction } from "../types";
 
-const UserContext = createContext(null);
+const UserContext = createContext<{
+  userState: User;
+  dispatch: Dispatch<UserAction>;
+} | null>(null);
 
-export function UserProvider({ children }) {
-  const [user, setUser] = useState(null);
+export function UserProvider({ children }: { children: ReactNode }) {
+  const [userState, dispatch] = useReducer(userReducer, userInitialState);
 
   return (
-    <UserContext.Provider value={{ user, setUser }}>
+    <UserContext.Provider value={{ userState, dispatch }}>
       {children}
     </UserContext.Provider>
   );
