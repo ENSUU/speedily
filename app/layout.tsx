@@ -3,7 +3,7 @@
 import "./globals.css";
 
 import Navbar from "./components/Navbar";
-import { UserProvider } from "./_context/userContext";
+import { UserContextProvider } from "./context/UserContext";
 
 export default function HomeLayout({
   children,
@@ -16,10 +16,10 @@ export default function HomeLayout({
         {/* Layout UI */}
         {/* Place children where you want to render a page or nested layout */}
         <main className="h-dvh flex flex-col justify-center items-center">
-          <UserProvider>
+          <UserContextProvider>
             <Navbar />
             {children}
-          </UserProvider>
+          </UserContextProvider>
         </main>
       </body>
     </html>

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import Form from "next/form";
+import { supabase } from "../../supabaseClient";
 
 const TypingTest = ({ restartFunction }) => {
   const [userInput, setUserInput] = useState("");
@@ -11,22 +12,22 @@ const TypingTest = ({ restartFunction }) => {
   const [isTestComplete, setIsTestComplete] = useState(false);
 
   // Quote state.
-  const [quote, setQuote] = useState(
+  const [quote, setQuote] = useState<string>(
     "",
     // "Hello, my name is David.",
     // "I'm selfish, impatient and a little insecure. I make mistakes, I am out of control and at times hard to handle. But if you can't handle me at my worst, then you sure as hell don't deserve me at my best.",
   );
-  const [quoteAuthor, setQuoteAuthor] = useState("");
+  const [quoteAuthor, setQuoteAuthor] = useState<string>("");
 
   // Global index. Needed for character input validation by user.
-  let runningIndex = 0;
-  let globalIndex = 0;
+  // let runningIndex: number = 0;
+  let globalIndex: number = 0;
 
   // Timing state. Needed to calculate WPM
   const [startTime, setStartTime] = useState<number | null>(null);
   const [endTime, setEndTime] = useState<number | null>(null);
 
-  const cleanFetchedQuote = (quote) => {
+  const cleanFetchedQuote = (quote: string): string => {
     const quoteChars = quote.split(" ");
     for (let i = 0; i < quoteChars.length; i++) {
       if (quoteChars[i] == "—") {
@@ -36,13 +37,20 @@ const TypingTest = ({ restartFunction }) => {
     return quoteChars.join(" ");
   };
 
+  const getUser = async () => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    console.log(user);
+  };
+
   useEffect(() => {
-    const fetchQuote = async () => {
+    const fetchQuote = async (): Promise<void> => {
       try {
-        const response = await fetch("https://api.quotable.io/quotes/random");
-        const json = await response.json();
-        setQuote(cleanFetchedQuote(json[0].content));
-        setQuoteAuthor(json[0].author);
+        const response = await fetch("http://api.quotable.io/random");
+        const data = await response.json();
+        setQuote(cleanFetchedQuote(data.content));
+        setQuoteAuthor(data.author);
       } catch (err) {
         setQuote("Unable to generate a quote. Please try again later!");
         setQuoteAuthor("ENSUU");
@@ -50,6 +58,7 @@ const TypingTest = ({ restartFunction }) => {
       }
     };
     fetchQuote();
+    getUser();
   }, []);
 
   useEffect(() => {
@@ -57,7 +66,7 @@ const TypingTest = ({ restartFunction }) => {
     restartButtonRef.current?.focus();
   }, [quote, isTestComplete]);
 
-  const handleKeyDown = (e) => {
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     e.preventDefault();
 
     if (!startTime) {
@@ -89,16 +98,15 @@ const TypingTest = ({ restartFunction }) => {
     }
   };
 
-  const getCharClass = (char: string, index: number) => {
+  const getCharClass = (char: string, index: number): string => {
     if (index < userInput.length) {
-      console.log(char, quote[index]);
       return char === quote[index] ? "bg-green-400/50" : "bg-red-400/50";
     } else if (index == userInput.length) {
       return "bg-yellow-400/50";
     }
   };
 
-  const checkCorrectChar = (inputChar) => {
+  const checkCorrectChar = (inputChar: string): void => {
     console.log(inputChar, quote.split("")[currCharIndex]);
     if (inputChar != quote.split("")[currCharIndex]) {
       console.log(
@@ -108,16 +116,21 @@ const TypingTest = ({ restartFunction }) => {
     }
   };
 
-  const getRawWPM = (startTime, endTime) => {
+  const getRawWPM = (startTime: number, endTime: number): number | null => {
     if (!startTime || !endTime) {
       return null;
     }
+
     const attempt_duration = (endTime - startTime) / 1000;
     console.log((userInput.length / 5 / (attempt_duration / 60)).toFixed(2));
     return Math.round(userInput.length / 5 / (attempt_duration / 60));
   };
 
-  const getNetWPM = (startTime, endTime, rawWPM) => {
+  const getNetWPM = (
+    startTime: number,
+    endTime: number,
+    rawWPM: number,
+  ): number | null => {
     if (!startTime || !endTime) {
       return null;
     }
@@ -126,11 +139,11 @@ const TypingTest = ({ restartFunction }) => {
     return Math.round(calculatedNetWPM);
   };
 
-  const handleRestartBtnClick = () => {
+  const handleRestartBtnClick = (): void => {
     restartFunction();
   };
 
-  const handleEnterPressed = (e) => {
+  const handleEnterPressed = (e: KeyboardEvent) => {
     if (e.key == "Enter") {
       restartFunction();
     }
@@ -138,7 +151,7 @@ const TypingTest = ({ restartFunction }) => {
 
   // Grab the indices for each space character in input quote. Used to add spans containing spaces when rendering quote.
   const space_indices: Set<number> = new Set();
-  const getSpaceIndices = () => {
+  const getSpaceIndices = (): void => {
     quote.split("").forEach((char, index) => {
       if (char == " ") {
         space_indices.add(index);
@@ -242,7 +255,7 @@ const TypingTest = ({ restartFunction }) => {
       <div>
         <Form className="flex justify-center items-center mt-12" action="">
           <input
-            className="opacity-0"
+            className="opacity-0 !caret-transparent"
             type="text"
             onKeyDown={handleKeyDown}
             ref={userInputRef}

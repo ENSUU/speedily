@@ -3,21 +3,24 @@
 import { supabase } from "../../supabaseClient";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useUser } from "../_context/userContext";
-
-import { useState } from "react";
+import { useUser } from "../context/UserContext";
 
 const Navbar = () => {
+  const { userState, dispatch } = useUser();
   const router = useRouter();
-
-  const { user, setUser } = useUser();
 
   const handleLogout = async () => {
     const { err } = await supabase.auth.signOut();
-    setUser(null);
-    console.log("Logged out.");
-    router.push("login");
+    dispatch({ type: "logout" });
+    router.push("/login");
   };
+
+  const getUser = async () => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+  };
+  getUser();
 
   return (
     <div
@@ -25,7 +28,7 @@ const Navbar = () => {
       className="w-dvw my-4 flex flex-col justify-center items-center gap-4"
     >
       <h1 className="text-4xl font-bold">Speedily</h1>
-      {user != null && (
+      {userState.user != null && (
         <Link href="" onClick={handleLogout}>
           Logout
         </Link>
